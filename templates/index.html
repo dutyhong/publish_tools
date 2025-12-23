@@ -1,0 +1,540 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>多平台发布工具</title>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@300;400;500;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #6366f1;
+            --primary-dark: #4f46e5;
+            --secondary: #10b981;
+            --bg-dark: #0f172a;
+            --bg-card: #1e293b;
+            --bg-input: #334155;
+            --text-primary: #f1f5f9;
+            --text-secondary: #94a3b8;
+            --border: #475569;
+            --shadow: rgba(0, 0, 0, 0.3);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Noto Sans SC', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: linear-gradient(135deg, var(--bg-dark) 0%, #1a1a2e 50%, #16213e 100%);
+            min-height: 100vh;
+            color: var(--text-primary);
+            padding: 40px 20px;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+
+        h1 {
+            font-size: 2.5rem;
+            font-weight: 700;
+            background: linear-gradient(135deg, var(--primary) 0%, #a855f7 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 10px;
+        }
+
+        .subtitle {
+            color: var(--text-secondary);
+            font-size: 1.1rem;
+        }
+
+        .card {
+            background: var(--bg-card);
+            border-radius: 16px;
+            padding: 30px;
+            margin-bottom: 24px;
+            box-shadow: 0 10px 40px var(--shadow);
+            border: 1px solid var(--border);
+        }
+
+        .card-title {
+            font-size: 1.2rem;
+            font-weight: 600;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .card-title .icon {
+            width: 32px;
+            height: 32px;
+            background: var(--primary);
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 16px;
+        }
+
+        .platforms {
+            display: flex;
+            gap: 16px;
+            flex-wrap: wrap;
+        }
+
+        .platform-option {
+            flex: 1;
+            min-width: 150px;
+        }
+
+        .platform-option input {
+            display: none;
+        }
+
+        .platform-option label {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 20px;
+            background: var(--bg-input);
+            border: 2px solid var(--border);
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .platform-option label:hover {
+            border-color: var(--primary);
+            transform: translateY(-2px);
+        }
+
+        .platform-option input:checked + label {
+            border-color: var(--primary);
+            background: rgba(99, 102, 241, 0.15);
+            box-shadow: 0 0 20px rgba(99, 102, 241, 0.3);
+        }
+
+        .platform-icon {
+            font-size: 32px;
+            margin-bottom: 8px;
+        }
+
+        .platform-name {
+            font-weight: 500;
+        }
+
+        .input-group {
+            margin-bottom: 20px;
+        }
+
+        .input-group label {
+            display: block;
+            margin-bottom: 8px;
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+        }
+
+        input[type="text"], textarea {
+            width: 100%;
+            padding: 14px 18px;
+            background: var(--bg-input);
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            color: var(--text-primary);
+            font-size: 1rem;
+            font-family: inherit;
+            transition: all 0.3s ease;
+        }
+
+        input[type="text"]:focus, textarea:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.2);
+        }
+
+        textarea {
+            min-height: 200px;
+            resize: vertical;
+            line-height: 1.6;
+        }
+
+        .btn {
+            padding: 14px 28px;
+            border: none;
+            border-radius: 10px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, var(--primary) 0%, #8b5cf6 100%);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 30px rgba(99, 102, 241, 0.4);
+        }
+
+        .btn-secondary {
+            background: var(--secondary);
+            color: white;
+        }
+
+        .btn-secondary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 30px rgba(16, 185, 129, 0.4);
+        }
+
+        .btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none !important;
+        }
+
+        .btn-group {
+            display: flex;
+            gap: 16px;
+            margin-top: 20px;
+        }
+
+        .result-section {
+            display: none;
+        }
+
+        .result-section.show {
+            display: block;
+            animation: fadeIn 0.5s ease;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .status-bar {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: var(--bg-card);
+            padding: 16px;
+            border-top: 1px solid var(--border);
+            display: none;
+        }
+
+        .status-bar.show {
+            display: block;
+        }
+
+        .status-content {
+            max-width: 900px;
+            margin: 0 auto;
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+
+        .spinner {
+            width: 24px;
+            height: 24px;
+            border: 3px solid var(--border);
+            border-top-color: var(--primary);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        .loading-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(15, 23, 42, 0.8);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+        }
+
+        .loading-overlay.show {
+            display: flex;
+        }
+
+        .loading-box {
+            background: var(--bg-card);
+            padding: 40px;
+            border-radius: 16px;
+            text-align: center;
+        }
+
+        .loading-box .spinner {
+            width: 48px;
+            height: 48px;
+            margin: 0 auto 20px;
+        }
+
+        .tips {
+            background: rgba(99, 102, 241, 0.1);
+            border: 1px solid rgba(99, 102, 241, 0.3);
+            border-radius: 10px;
+            padding: 16px;
+            margin-top: 20px;
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+        }
+
+        .tips strong {
+            color: var(--primary);
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>🚀 多平台发布工具</h1>
+            <p class="subtitle">一键发布到微信公众号、头条、小红书</p>
+        </header>
+
+        <!-- Step 1: 选择平台 -->
+        <div class="card">
+            <div class="card-title">
+                <span class="icon">1</span>
+                选择发布平台
+            </div>
+            <div class="platforms">
+                <div class="platform-option">
+                    <input type="checkbox" id="wechat" value="wechat">
+                    <label for="wechat">
+                        <span class="platform-icon">💬</span>
+                        <span class="platform-name">微信公众号</span>
+                    </label>
+                </div>
+                <div class="platform-option">
+                    <input type="checkbox" id="toutiao" value="toutiao" checked>
+                    <label for="toutiao">
+                        <span class="platform-icon">📰</span>
+                        <span class="platform-name">头条号</span>
+                    </label>
+                </div>
+                <div class="platform-option">
+                    <input type="checkbox" id="xiaohongshu" value="xiaohongshu">
+                    <label for="xiaohongshu">
+                        <span class="platform-icon">📕</span>
+                        <span class="platform-name">小红书</span>
+                    </label>
+                </div>
+            </div>
+        </div>
+
+        <!-- Step 2: 输入主题 -->
+        <div class="card">
+            <div class="card-title">
+                <span class="icon">2</span>
+                输入文章主题
+            </div>
+            <div class="input-group">
+                <label>输入一个主题，AI 将自动生成标题和正文</label>
+                <input type="text" id="topic" placeholder="例如：如何提高工作效率、春节旅游攻略、健康饮食指南...">
+            </div>
+            <button class="btn btn-primary" id="generateBtn" onclick="generateContent()">
+                ✨ AI 生成内容
+            </button>
+        </div>
+
+        <!-- Step 3: 预览和编辑 -->
+        <div class="card result-section" id="resultSection">
+            <div class="card-title">
+                <span class="icon">3</span>
+                预览和编辑
+            </div>
+            <div class="input-group">
+                <label>文章标题</label>
+                <input type="text" id="title" placeholder="标题">
+            </div>
+            <div class="input-group">
+                <label>文章正文</label>
+                <textarea id="content" placeholder="正文内容"></textarea>
+            </div>
+            <div class="btn-group">
+                <button class="btn btn-primary" onclick="regenerate()">
+                    🔄 重新生成
+                </button>
+                <button class="btn btn-secondary" onclick="publishArticle()">
+                    🚀 确认发布
+                </button>
+            </div>
+            <div class="tips">
+                <strong>提示：</strong>点击"确认发布"后，系统会自动打开浏览器窗口。如需登录，请扫码完成登录。发布过程中请不要关闭浏览器窗口。
+            </div>
+        </div>
+    </div>
+
+    <!-- Loading Overlay -->
+    <div class="loading-overlay" id="loadingOverlay">
+        <div class="loading-box">
+            <div class="spinner"></div>
+            <p id="loadingText">正在生成内容...</p>
+        </div>
+    </div>
+
+    <!-- Status Bar -->
+    <div class="status-bar" id="statusBar">
+        <div class="status-content">
+            <div class="spinner"></div>
+            <span id="statusText">正在发布...</span>
+        </div>
+    </div>
+
+    <script>
+        function showLoading(text) {
+            document.getElementById('loadingText').textContent = text;
+            document.getElementById('loadingOverlay').classList.add('show');
+        }
+
+        function hideLoading() {
+            document.getElementById('loadingOverlay').classList.remove('show');
+        }
+
+        function showStatus(text) {
+            document.getElementById('statusText').textContent = text;
+            document.getElementById('statusBar').classList.add('show');
+        }
+
+        function hideStatus() {
+            document.getElementById('statusBar').classList.remove('show');
+        }
+
+        async function generateContent() {
+            const topic = document.getElementById('topic').value.trim();
+            if (!topic) {
+                alert('请输入文章主题');
+                return;
+            }
+
+            showLoading('AI 正在生成内容，请稍候...');
+
+            try {
+                const response = await fetch('/api/generate', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ topic })
+                });
+
+                const data = await response.json();
+
+                if (data.error) {
+                    alert(data.error);
+                    return;
+                }
+
+                document.getElementById('title').value = data.title;
+                document.getElementById('content').value = data.content;
+                document.getElementById('resultSection').classList.add('show');
+
+            } catch (error) {
+                alert('生成失败: ' + error.message);
+            } finally {
+                hideLoading();
+            }
+        }
+
+        function regenerate() {
+            generateContent();
+        }
+
+        async function publishArticle() {
+            const platforms = [];
+            if (document.getElementById('wechat').checked) platforms.push('wechat');
+            if (document.getElementById('toutiao').checked) platforms.push('toutiao');
+            if (document.getElementById('xiaohongshu').checked) platforms.push('xiaohongshu');
+
+            if (platforms.length === 0) {
+                alert('请选择至少一个发布平台');
+                return;
+            }
+
+            const title = document.getElementById('title').value.trim();
+            const content = document.getElementById('content').value.trim();
+
+            if (!title || !content) {
+                alert('标题和正文不能为空');
+                return;
+            }
+
+            showStatus('正在启动发布流程...');
+
+            try {
+                const response = await fetch('/api/publish', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ platforms, title, content })
+                });
+
+                const data = await response.json();
+
+                if (data.error) {
+                    alert(data.error);
+                    hideStatus();
+                    return;
+                }
+
+                // 开始轮询状态
+                pollStatus();
+
+            } catch (error) {
+                alert('发布失败: ' + error.message);
+                hideStatus();
+            }
+        }
+
+        async function pollStatus() {
+            try {
+                const response = await fetch('/api/status');
+                const status = await response.json();
+
+                if (status.running) {
+                    showStatus(status.message || '正在发布...');
+                    setTimeout(pollStatus, 1000);
+                } else {
+                    if (status.completed && status.completed.length > 0) {
+                        alert('发布完成！\n已发布到: ' + status.completed.join(', '));
+                    }
+                    hideStatus();
+                }
+            } catch (error) {
+                console.error('Status poll error:', error);
+                setTimeout(pollStatus, 2000);
+            }
+        }
+
+        // Enter 键触发生成
+        document.getElementById('topic').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                generateContent();
+            }
+        });
+    </script>
+</body>
+</html>
+

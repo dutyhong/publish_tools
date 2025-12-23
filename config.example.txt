@@ -1,0 +1,15 @@
+# AI 服务商配置
+# 复制此文件为 .env 并填写你的配置
+
+# 选择服务商: openai, qwen, deepseek, moonshot
+AI_PROVIDER=deepseek
+
+# API Key (根据选择的服务商填写对应的 Key)
+API_KEY=your_api_key_here
+
+# ========== 各服务商申请地址 ==========
+# OpenAI: https://platform.openai.com/
+# 通义千问: https://dashscope.console.aliyun.com/
+# DeepSeek: https://platform.deepseek.com/
+# Moonshot: https://platform.moonshot.cn/
+

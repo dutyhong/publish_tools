@@ -1,0 +1,50 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+venv/
+ENV/
+env/
+.venv/
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
+
+# 登录状态（包含敏感信息）
+auth_states/
+
+# 调试截图
+*.png
+
+# 日志
+*.log
+
+# 系统文件
+.DS_Store
+Thumbs.db
+
+# 临时文件
+*.tmp
+*.temp
+
+# 打包文件
+dist/
+build/
+*.egg-info/
+*.egg
+
+# 环境变量
+.env
+.env.local
+
+# 测试
+.pytest_cache/
+.coverage
+htmlcov/
+
