@@ -120,6 +120,13 @@ def main():
                 context.close()
                 
         print("\nAll tasks completed.")
+        
+        # 询问是否保持浏览器打开（方便下次继续使用）
+        keep_open = input("保持浏览器打开？(y/n) [n]: ").strip().lower()
+        if keep_open == 'y':
+            print("浏览器保持打开。手动关闭浏览器窗口退出。")
+            input("按 Enter 关闭浏览器...")
+        
         browser.close()
 
 if __name__ == "__main__":

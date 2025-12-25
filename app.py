@@ -1,5 +1,7 @@
 import os
+import sys
 import threading
+import webbrowser
 from flask import Flask, render_template, request, jsonify
 from playwright.sync_api import sync_playwright
 
@@ -12,6 +14,7 @@ except ImportError:
 
 from utils.content_generator import generate_article
 from utils.auth_manager import AuthManager
+from utils.browser_helper import get_browser_config, ensure_browser
 from platforms.wechat import WeChatPublisher
 from platforms.toutiao import ToutiaoPublisher
 from platforms.xiaohongshu import XiaohongshuPublisher
@@ -64,16 +67,21 @@ def publish_article():
     platforms = data.get('platforms', [])
     title = data.get('title', '')
     content = data.get('content', '')
+    image_path = data.get('imagePath', '')
     
     if not platforms:
         return jsonify({"error": "请选择至少一个发布平台"}), 400
     if not title or not content:
         return jsonify({"error": "标题和正文不能为空"}), 400
     
+    # 小红书必须上传图片
+    if 'xiaohongshu' in platforms and not image_path:
+        return jsonify({"error": "小红书发布必须提供图片路径"}), 400
+    
     # 在后台线程中执行发布
     thread = threading.Thread(
         target=do_publish,
-        args=(platforms, title, content)
+        args=(platforms, title, content, image_path)
     )
     thread.start()
     
@@ -82,7 +90,7 @@ def publish_article():
         "message": "开始发布，请在浏览器窗口中完成操作"
     })
 
-def do_publish(platforms, title, content):
+def do_publish(platforms, title, content, image_path=''):
     """执行发布（在后台线程中运行）"""
     global publish_status
     
@@ -96,7 +104,7 @@ def do_publish(platforms, title, content):
     article = {
         'title': title,
         'content': content,
-        'images': []
+        'images': [image_path] if image_path else []
     }
     
     platform_map = {
@@ -108,8 +116,15 @@ def do_publish(platforms, title, content):
     auth_manager = AuthManager()
     
     try:
+        # 获取浏览器配置（智能检测本地 Chrome）
+        browser_config = get_browser_config()
+        
         with sync_playwright() as p:
-            browser = p.chromium.launch(headless=False)
+            launch_options = {"headless": False}
+            if browser_config.get("executable_path"):
+                launch_options["executable_path"] = browser_config["executable_path"]
+            
+            browser = p.chromium.launch(**launch_options)
             
             for platform_name in platforms:
                 if platform_name not in platform_map:
@@ -152,10 +167,38 @@ def get_status():
     """获取发布状态"""
     return jsonify(publish_status)
 
+def startup_check():
+    """启动时检查环境"""
+    print("=" * 50)
+    print("🚀 多平台发布工具")
+    print("=" * 50)
+    
+    # 检测浏览器
+    print("\n[1/2] 检测浏览器...")
+    try:
+        ensure_browser()
+    except SystemExit:
+        print("浏览器检测失败，程序退出")
+        sys.exit(1)
+    
+    print("\n[2/2] 启动 Web 服务...")
+    print("\n" + "=" * 50)
+    print("✅ 启动成功！")
+    print("🌐 请访问: http://127.0.0.1:8080")
+    print("=" * 50)
+    print("\n提示：关闭此窗口将停止服务\n")
+
 if __name__ == '__main__':
-    print("=" * 50)
-    print("多平台发布工具")
-    print("请访问: http://127.0.0.1:8080")
-    print("=" * 50)
-    app.run(host='127.0.0.1', port=8080, debug=True, threaded=True)
+    startup_check()
+    
+    # 自动打开浏览器
+    def open_browser():
+        import time
+        time.sleep(1.5)  # 等待服务启动
+        webbrowser.open('http://127.0.0.1:8080')
+    
+    threading.Thread(target=open_browser, daemon=True).start()
+    
+    # 启动服务（关闭 debug 模式避免重复启动）
+    app.run(host='127.0.0.1', port=8080, debug=False, threaded=True)
 

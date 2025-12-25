@@ -338,11 +338,20 @@
                     </label>
                 </div>
                 <div class="platform-option">
-                    <input type="checkbox" id="xiaohongshu" value="xiaohongshu">
+                    <input type="checkbox" id="xiaohongshu" value="xiaohongshu" onchange="toggleImageInput()">
                     <label for="xiaohongshu">
                         <span class="platform-icon">📕</span>
                         <span class="platform-name">小红书</span>
                     </label>
+                </div>
+            </div>
+            
+            <!-- 小红书图片路径输入 -->
+            <div class="input-group" id="imageInputGroup" style="display: none; margin-top: 20px;">
+                <label>📷 小红书图片路径（必填）</label>
+                <input type="text" id="imagePath" placeholder="例如：/Users/duty/pictures/photo.jpg">
+                <div class="tips" style="margin-top: 10px;">
+                    <strong>提示：</strong>小红书发布必须上传图片。请输入本地图片的完整路径。
                 </div>
             </div>
         </div>
@@ -476,9 +485,16 @@
 
             const title = document.getElementById('title').value.trim();
             const content = document.getElementById('content').value.trim();
+            const imagePath = document.getElementById('imagePath').value.trim();
 
             if (!title || !content) {
                 alert('标题和正文不能为空');
+                return;
+            }
+            
+            // 小红书必须上传图片
+            if (platforms.includes('xiaohongshu') && !imagePath) {
+                alert('小红书发布必须提供图片路径');
                 return;
             }
 
@@ -488,7 +504,7 @@
                 const response = await fetch('/api/publish', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ platforms, title, content })
+                    body: JSON.stringify({ platforms, title, content, imagePath })
                 });
 
                 const data = await response.json();
@@ -534,6 +550,13 @@
                 generateContent();
             }
         });
+        
+        // 切换小红书图片输入框显示
+        function toggleImageInput() {
+            const xhsChecked = document.getElementById('xiaohongshu').checked;
+            const imageGroup = document.getElementById('imageInputGroup');
+            imageGroup.style.display = xhsChecked ? 'block' : 'none';
+        }
     </script>
 </body>
 </html>
